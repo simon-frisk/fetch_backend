@@ -13,6 +13,7 @@ const datastore = {
       }
       this.pointSources.push(entry)
     }
+    // TODO: make sure inserted in sorted order
     // TODO: What if negative points?
   },
 
@@ -30,6 +31,50 @@ const datastore = {
 
   // returns null if not enough points
   spend(points) {
+    let pointDeductions = []
+    let pointSourceIndex = 0
+
+    // Loop through all point sources until enough points are found
+    while (points > 0) {
+      // If no more point sources left, then there are not enough points in account
+      // to spend
+      if (pointSourceIndex >= this.pointSources.length)
+        break
+      // Deduct points from next point source
+      pointSource = this.pointSources[pointSourceIndex]
+      if (pointSource.points < points) {
+        pointDeductions.push(pointSource.points)
+        points -= pointSource.points
+      }
+      else {
+        pointDeductions.push(points)
+        points -= points
+      }
+      // Increment point source index
+      pointSourceIndex += 1
+    }
+    // If not enough points, return null
+    if (points != 0)
+      return null
+    // If enough points, write deductions to database and return map of what companies were deducted from
+    else {
+      // TODO: I DONT LIKE THIS
+      const payerDeductions = {}
+      for (pointIndex in pointDeductions) {
+        const payer = this.pointSources[0].payer
+        // Add points to payerDeductions map
+        if (payerDeductions[payer])
+          payerDeductions[payer] += pointDeductions[pointIndex]
+        else
+          payerDeductions[payer] = pointDeductions[pointIndex]
+        // Write deductions to database
+        if (this.pointSources[0].points == pointDeductions[pointIndex])
+          this.pointSources.shift() // Remove record from pointSources
+        else // This else branch can only run in the last iteration
+          this.pointSources[0].points = this.pointSources[0].points - pointDeductions[pointIndex]
+      }
+      return payerDeductions
+    }
   }
 }
 

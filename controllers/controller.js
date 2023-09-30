@@ -1,14 +1,15 @@
 const datastore = require("../services/datastore")
 
+// TODO: Validation
+
 module.exports = {
   add(body) {
     console.log(body)
-    // TODO: Validation
     datastore.add(body.payer, body.points, body.timestamp)
   },
 
-  spend() {
-
+  spend(body) {
+    datastore.spend(body.points)
   },
 
   balance() {

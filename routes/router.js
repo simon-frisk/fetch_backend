@@ -8,6 +8,10 @@ router.post("/add", (req, res) => {
   res.sendStatus(200)
 })
 
+router.post("/spend", (req, res) => {
+  res.send(controller.spend(req.body))
+})
+
 router.get("/balance", (req, res) => {
   res.send(controller.balance())
 })
