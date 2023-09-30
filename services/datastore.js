@@ -7,13 +7,21 @@ const datastore = {
   add(payer, points, timestamp) {
     if (points > 0) {
       let entry = {
-        "payer": payer,
-        "points": points,
-        "timestamp": timestamp
+        payer: payer,
+        points: points,
+        timestamp: Date.parse(timestamp)
       }
-      this.pointSources.push(entry)
+      let isInserted = false
+      for (let i in this.pointSources) {
+        if (entry.timestamp < this.pointSources[i].timestamp) {
+          this.pointSources.splice(i, 0, entry)
+          isInserted = true
+        }
+      }
+      if (!isInserted)
+        this.pointSources.push(entry)
     }
-    // TODO: make sure inserted in sorted order
+    console.log(this.pointSources)
     // TODO: What if negative points?
   },
 
