@@ -1,18 +1,19 @@
+const express = require("express")
 const datastore = require("../services/datastore")
 
-// TODO: Validation
+const router = express.Router()
 
-module.exports = {
-  add(body) {
-    console.log(body)
-    datastore.add(body.payer, body.points, body.timestamp)
-  },
+router.post("/add", (req, res) => {
+  datastore.add(req.body.payer, req.body.points, req.body.timestamp)
+  res.sendStatus(200)
+})
 
-  spend(body) {
-    datastore.spend(body.points)
-  },
+router.post("/spend", (req, res) => {
+  res.send(controller.spend(req.body.points))
+})
 
-  balance() {
-    return datastore.balance()
-  }
-}
+router.get("/balance", (req, res) => {
+  res.send(datastore.balance())
+})
+
+module.exports = router

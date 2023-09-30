@@ -1,7 +1,7 @@
 const express = require("express")
 const logger = require("morgan")
 
-const router = require("./routes/router")
+const controller = require("./controllers/controller")
 
 const app = express()
 const PORT = 8000
@@ -10,8 +10,8 @@ const PORT = 8000
 app.use(logger("dev"))
 app.use(express.json())
 
-// Router configuration
-app.use('/', router)
+// Controller configuration
+app.use('/', controller)
 
 // Send 404 if no routes match
 app.use((req, res, next) => {
