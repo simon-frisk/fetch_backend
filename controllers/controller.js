@@ -4,16 +4,24 @@ const datastore = require("../services/datastore")
 const router = express.Router()
 
 router.post("/add", (req, res) => {
-  datastore.add(req.body.payer, req.body.points, req.body.timestamp)
-  res.sendStatus(200)
+  let success = datastore.add(req.body.payer, req.body.points, req.body.timestamp)
+  if (success)
+    res.sendStatus(200)
+  else
+    res.status(400).send("Failed to add points")
 })
 
 router.post("/spend", (req, res) => {
-  res.send(controller.spend(req.body.points))
+  let spendmap = datastore.spend(req.body.points)
+  if (spendmap == null)
+    res.status(400).send("User does not have enough points.")
+  else
+    res.status(200).send(spendmap)
 })
 
 router.get("/balance", (req, res) => {
-  res.send(datastore.balance())
+  let balance = datastore.balance()
+  res.send(balance)
 })
 
 module.exports = router

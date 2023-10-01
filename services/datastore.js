@@ -1,16 +1,26 @@
 
 const datastore = {
-  // Mock a database with an in memory array.
+  // Store records in memory
   // This stores entries of form { payer: "...", points: ..., timestamp: ... }
   pointSources: [],
+  // All payers that the users have been connected to
+  payers: [],
 
+  // Add points to the user
+  // return true if succeeds, false if not
   add(payer, points, timestamp) {
+    // Register payer
+    if (!this.payers.some(x => x.payer == payer)) {
+      this.payers.push(payer)
+    }
+    // If positive points, add a new entry in the pointSources list
     if (points > 0) {
       let entry = {
         payer: payer,
         points: points,
         timestamp: Date.parse(timestamp)
       }
+      // Insert in the correct place so the list remains sorted
       let isInserted = false
       for (let i in this.pointSources) {
         if (entry.timestamp < this.pointSources[i].timestamp) {
@@ -20,24 +30,59 @@ const datastore = {
       }
       if (!isInserted)
         this.pointSources.push(entry)
+      return true
     }
-    console.log(this.pointSources)
-    // TODO: What if negative points?
+    // Only store entries with positive number of points. If negative, instead deduct from the first
+    // entry from that payer. If not enough exists, discard this add
+    else if (points < 0) {
+      // Count points from this payer to make sure enough points exists from this payer
+      // to deduct 
+      let sum = 0
+      for (let i in this.pointSources) {
+        const entry = this.pointSources[i]
+        if (entry.payer == payer) {
+          sum += entry.points
+        }
+      }
+      if (sum < Math.abs(points))
+        return false
+      // Deduct points
+      let index = 0
+      let length = this.pointSources.length
+      for (let i = 0; i < length; i++) {
+        const entry = this.pointSources[index]
+        if (entry.payer == payer) {
+          let deduct = Math.min(Math.abs(points), entry.points)
+          points += deduct
+          entry.points -= deduct
+          if (entry.points == 0)
+            this.pointSources.splice(index, 1)
+        }
+        else {
+          index++;
+        }
+      }
+      return true
+    }
   },
 
+  // Method to get balance
+  // return an object of user balance per payer
   balance() {
+    // Create object with all payers
     let payers = {}
+    for (let i in this.payers)
+      payers[this.payers[i]] = 0
+    // Populate payers object with the balance for each payer by iterating though pointSources
     for (let i in this.pointSources) {
-      let pointSource = this.pointSources[i];
-      if (payers[pointSource.payer])
-        payers[pointSource.payer] += pointSource.points
-      else
-        payers[pointSource.payer] = pointSource.points
+      let pointSource = this.pointSources[i]
+      payers[pointSource.payer] += pointSource.points
     }
     return payers
   },
 
-  // returns null if not enough points
+  // Method to spend x points
+  // return null if fails, else a object of what payers are billed how many points
   spend(points) {
     let pointDeductions = []
     let pointSourceIndex = 0
@@ -66,7 +111,6 @@ const datastore = {
       return null
     // If enough points, write deductions to database and return map of what companies were deducted from
     else {
-      // TODO: I DONT LIKE THIS
       const payerDeductions = {}
       for (pointIndex in pointDeductions) {
         const payer = this.pointSources[0].payer
