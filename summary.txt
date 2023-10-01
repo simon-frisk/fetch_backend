@@ -1,0 +1,23 @@
+1. Why did you choose the tools, libraries, and language you used for the coding exercise?
+
+I really like the Express.js framework for building REST APIs. I think it is simple, clear and
+fast to work with.
+
+2. What are the advantages and disadvantages of your solution?
+
+My solution stores data in memory which clearly would not work for a real solution. Then we would
+need a database. I also would prefer working with a strongly typed language like TypeScript in a
+larger project, as not having types for data models can make things unmanageble after a while. For a
+smaller and quicker project like this, not having strong typing increases my development speed.
+
+3. What has been a favorite school/personal project thus far? What about it that challenged you?
+
+My favorite project was Bookii, which was a mobile app I developed with a Node.js backend similar to
+this, and a React Native frontend. I had so much fun working on this and learned a lot. Bookii was
+an app where readers could keep track of and find books to read. The backend development was a lot of
+fun but also challanging, because I both had to have an API towards the frontend, but also had to 
+download data about books, like descriptions, genres and pictures, and data like the new york times
+bestseller lists. Because my storage space was very limited, I had to do this in a smart way, to not
+download data about books that were not in use in the app (there are a lot of books that are not
+likely to be browsed in the app). Solving these questions was definitely a challange but also a lot
+of fun, and the project really taught me how fun backend development can be.
